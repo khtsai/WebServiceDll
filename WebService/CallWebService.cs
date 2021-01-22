@@ -48,15 +48,6 @@ namespace WebService
 
                 return soapResponse;
             }
-            /*using (WebResponse response = webRequest.GetResponse())
-            {
-                using (StreamReader rd = new StreamReader(response.GetResponseStream()))
-                {
-                    soapResult = rd.ReadToEnd();
-                    Console.WriteLine(soapResult);
-                }
-                return soapResult;
-            }*/
         }
 
         private HttpWebRequest CreateWebRequest(string url, string action, string username, string password, string option, string host)
@@ -65,6 +56,8 @@ namespace WebService
             webRequest.Headers.Add("SOAPAction", action);
             
             string encoded = "";
+
+            //added authorization header only when having username and passord
             if (username != "" && password != "")
             {
                 if (option != "UTF8")
@@ -79,6 +72,7 @@ namespace WebService
                 webRequest.Headers["Authorization"] = string.Format("Basic {0}", encoded);
             }
 
+            //specify the host in header if having the parameter
             if (host != "")
             {
                 webRequest.Headers["Host"] = host;
