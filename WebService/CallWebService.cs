@@ -3,12 +3,14 @@ using System.Xml;
 using System.Net;
 using System.IO;
 using System.Xml.Linq;
+using System.Security;
+using System.Net;
 
 namespace WebService
 {
     public class CallWebService
     {
-        public string SendRequest(string inputUrl, string actionUrl, string xmlDoc, string returnStyle = "XML", string username = "", string password = "", string host = "" , string option = "DEFAULT")
+        public string SendRequest(string inputUrl, string actionUrl, string xmlDoc, string returnStyle = "XML", string username = "", string password = "", string host = "" , string option = "DEFAULT", bool escaped = false)
         {
             var _url = inputUrl;
             var _action = actionUrl;
@@ -39,13 +41,15 @@ namespace WebService
                 string soapResponse = "";
                 if (returnStyle == "XML")
                 {
-                    soapResponse = xmldoc.InnerXml;
+                    if (escaped == false)
+                        soapResponse = WebUtility.HtmlDecode(xmldoc.InnerXml);
+                    else
+                        soapResponse = WebUtility.HtmlEncode(xmldoc.InnerXml);
                 }
                 else
                 {
                     soapResponse = xmldoc.InnerText;
                 }
-
                 return soapResponse;
             }
         }
@@ -53,6 +57,10 @@ namespace WebService
         private HttpWebRequest CreateWebRequest(string url, string action, string username, string password, string option, string host)
         {
             HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(url);
+
+            if (action == "")
+                action = "\"\"";
+
             webRequest.Headers.Add("SOAPAction", action);
             
             string encoded = "";
